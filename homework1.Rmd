@@ -1,0 +1,185 @@
+---
+title: "Homework1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Unsupervised learning, clustering documents around a similarity metric (kNN).
+
+\textbf{b)}
+
+Supervised learning, even in the case of auto-regression we have labeled training pairs $(X,Y)$, it just so happens $X$ is previous values of $Y$.
+
+\textbf{c)}
+Unsupervised learning, clustering 
+
+\textbf{d)}
+Supervised learning, linear regression or spline regression with labelled data.
+
+
+\subsubsection*{2}
+
+
+\subsubsection*{3}
+
+$$MSE(\hat{\beta}) = E(\hat{\beta}- \beta)^2$$
+
+
+We know that 
+
+$$Var(X) = E[X^2] - [E(X)]^2$$
+
+so we can re-write the above as 
+
+$$Var(\hat{\beta}- \beta) + [E(\hat{\beta}- \beta)]^2$$
+
+$$= Var(\hat{\beta}) + Var(\beta) + 2Cov(\hat{\beta},\beta) + [E(\hat{\beta}) - E(\beta)]^2$$
+
+
+Let's take each of these terms separately. 
+
+$$Var(\hat{\beta}) = Var(w\hat{\beta_1} + (1-w)\hat{\beta_2})$$
+
+$$=w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2Cov(w\hat{\beta_1},(1-w)\hat{\beta_2})$$
+
+$$=w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2w(1-w)\sigma_{12}$$
+
+$$Var(\beta)=0$$
+
+$$2Cov(\hat{\beta},\beta) = 0$$
+
+
+Let's next consider 
+$$[E(\hat{\beta}) - E(\beta)]^2$$
+
+$$[w(b_1+\beta) + (1-w)(b_2 + \beta) - \beta]^2$$
+
+
+Putting this altogether we get 
+
+$$MSE(\hat{\beta})  = w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2w(1-w)\sigma_{12} + [w(b_1+\beta) + (1-w)(b_2 + \beta) - \beta]^2$$
+$$MSE(\hat{\beta})  = w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2w(1-w)\sigma_{12} + [wb_1+w\beta + b_2 + \beta - w_b2 -w\beta - \beta]^2$$
+
+$$MSE(\hat{\beta})  = w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2w(1-w)\sigma_{12} + [wb_1 + b_2 - wb_2  ]^2$$
+$$MSE(\hat{\beta})  = w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2w(1-w)\sigma_{12} + [w(b_1 - b_2 -) + b_2  ]^2$$
+
+$$MSE(\hat{\beta})  = w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2w(1-w)\sigma_{12} + w^2(b_1 - b_2 -)^2 + 2b_2w(b_1 - b_2) + b_2^2 $$
+$$MSE(\hat{\beta})  = w^2\sigma_1^2 +(1-w)^2\sigma_2^2 + 2w(1-w)\sigma_{12} + w^2(b_1 - b_2 )^2 + 2b_2w(b_1 - b_2) + b_2^2 $$
+In order to minimize this function we can take the derivative with respect to $w$ 
+
+
+$$\frac{\delta }{\delta w} MSE(\hat{\beta})  = 2w\sigma_1^2 - 2(1-w)\sigma_2^2 + 2(1-w)\sigma_{12} - 2w\sigma_{12} + 2w(b_1 - b_2 )^2 + 2b_2(b_1 - b_2)  $$
+$$0  = 2w\sigma_1^2 - 2(1-w)\sigma_2^2 + 2(1-w)\sigma_{12} - 2w\sigma_{12} + 2w(b_1 - b_2 )^2 + 2b_2(b_1 - b_2) $$
+$$-2b_2(b_1 - b_2)  = 2w\sigma_1^2 - 2\sigma_2^2 + 2w\sigma_2^2 + 2\sigma_{12}-2w\sigma_{12} - 2w\sigma_{12} + 2w(b_1 - b_2 )^2  $$
+
+$$ 2\sigma_2^2 -2b_2(b_1 - b_2) -2\sigma_{12} = 2w\sigma_1^2  + 2w\sigma_2^2 -2w\sigma_{12} - 2w\sigma_{12} + 2w(b_1 - b_2 )^2  $$
+$$ \sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} = w(\sigma_1^2 +\sigma_2^2 -\sigma_{12} - \sigma_{12} + (b_1 - b_2 )^2)  $$
+
+$$ w = \frac{\sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} }{\sigma_1^2 -\sigma_2^2 -\sigma_{12} + \sigma_{12} + (b_1 - b_2 )^2}  $$
+
+$$ w = \frac{\sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} }{\sigma_1^2 +\sigma_2^2  - 2\sigma_{12} + (b_1 - b_2 )^2}  $$
+
+
+
+```{r}
+set.seed(123)
+x=rnorm(100) 
+e0=rnorm(100) 
+y=5-x+2*x^2+e0
+
+data = as.data.frame(cbind(x,y))
+
+
+
+plot(data,main="Scatter PLot of Simulated Data")
+```
+This model corresponds to 
+
+$$Y \sim N(5 - x + 2*x^2,1)$$
+
+where $n=100,p=3$
+According to the scatterplot there seems to be an exponential relationship between $X$ and $Y$ which would not be captured in linear regression.
+
+```{r}
+
+
+fit = lm(y ~ poly(x,2),data=data)
+
+
+#equal size split means 50/50
+train_subset_indexes <- sample(100,50)
+
+train_fit = lm(y ~ poly(x,2),data=data[train_subset_indexes,])
+
+mean((predict(train_fit,newdata=data.frame(x=data$x[-train_subset_indexes]))-data$y[-train_subset_indexes])^2)
+
+mse <- c()
+train_sizes = c(10, 40, 80, 90, 30)
+for (i in seq(1,5)){
+  train_subset_indexes <- sample(100,train_sizes[i])
+  train_fit = lm(y ~ poly(x,2),data=data[train_subset_indexes,])
+  
+  mse<-c(mse,mean((predict(train_fit,newdata=data.frame(x=data$x[-train_subset_indexes]))-data$y[-train_subset_indexes])^2))
+}
+
+print (cbind(train_sizes,mse))
+
+# according to https://rpubs.com/maulikpatel/226237 we can use
+# the boot pacakge 
+
+library(boot)
+set.seed(1000)
+LOOCV <- c()
+model_num <- seq(1,4)
+
+glm.fit = glm(y ~ x, data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+glm.fit = glm(y ~ poly(x,2), data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+glm.fit = glm(y ~ poly(x,3), data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+glm.fit = glm(y ~ poly(x,4), data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+print (cbind(model_num,LOOCV))
+
+```
+
+
+
+
+
+
+```{r}
+set.seed(1)
+LOOCV <- c()
+model_num <- seq(1,4)
+
+glm.fit = glm(y ~ x, data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+glm.fit = glm(y ~ poly(x,2), data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+glm.fit = glm(y ~ poly(x,3), data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+glm.fit = glm(y ~ poly(x,4), data=data) 
+LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
+
+print (cbind(model_num,LOOCV))
+
+```
+
+The LOOCV scores do not change at all, which makes sense 
+
+
+The second model had the best score because it is the true model. 
+
