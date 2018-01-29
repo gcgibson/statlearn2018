@@ -178,7 +178,7 @@ print (cbind(model_num,LOOCV))
 
 ```
 
-The LOOCV scores do not change at all, which makes sense 
+The LOOCV scores do not change at all, which makes sense because there is no sampling method, we leave out each observation deterministically. 
 
 
 The second model had the best score because it is the true model. 
