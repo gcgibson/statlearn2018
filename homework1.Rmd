@@ -1,13 +1,18 @@
 ---
-title: "Homework1"
-output: html_document
+title: "Homework 1"
+author: "Casey Gibson"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+### Problem 1
 
+\textbf{a)}
 Unsupervised learning, clustering documents around a similarity metric (kNN).
 
 \textbf{b)}
@@ -21,10 +26,7 @@ Unsupervised learning, clustering
 Supervised learning, linear regression or spline regression with labelled data.
 
 
-\subsubsection*{2}
-
-
-\subsubsection*{3}
+### Problem 2
 
 $$MSE(\hat{\beta}) = E(\hat{\beta}- \beta)^2$$
 
@@ -35,7 +37,7 @@ $$Var(X) = E[X^2] - [E(X)]^2$$
 
 so we can re-write the above as 
 
-$$Var(\hat{\beta}- \beta) + [E(\hat{\beta}- \beta)]^2$$
+$$MSE(\hat{\beta}) = Var(\hat{\beta}- \beta) + [E(\hat{\beta}- \beta)]^2$$
 
 $$= Var(\hat{\beta}) + Var(\beta) + 2Cov(\hat{\beta},\beta) + [E(\hat{\beta}) - E(\beta)]^2$$
 
@@ -83,7 +85,17 @@ $$ w = \frac{\sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} }{\sigma_1^2 -\sigma_2^2 -\
 
 $$ w = \frac{\sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} }{\sigma_1^2 +\sigma_2^2  - 2\sigma_{12} + (b_1 - b_2 )^2}  $$
 
+### Problem 2
 
+\textbf{a)}
+
+This model corresponds to 
+
+$$Y \sim N(5 - x + 2*x^2,1)$$
+
+where $n=100,p=3$
+
+\textbf{b)}
 
 ```{r}
 set.seed(123)
@@ -97,40 +109,48 @@ data = as.data.frame(cbind(x,y))
 
 plot(data,main="Scatter PLot of Simulated Data")
 ```
-This model corresponds to 
 
-$$Y \sim N(5 - x + 2*x^2,1)$$
-
-where $n=100,p=3$
-According to the scatterplot there seems to be an exponential relationship between $X$ and $Y$ which would not be captured in linear regression.
-
+According to the scatterplot there seems to be a quadratic relationship between $X$ and $Y$ which would not be captured in linear regression.
+\textbf{c)}
 ```{r}
 
 
 fit = lm(y ~ poly(x,2),data=data)
+```
 
-
+\textbf{d)}
+```{r}
 #equal size split means 50/50
 train_subset_indexes <- sample(100,50)
 
 train_fit = lm(y ~ poly(x,2),data=data[train_subset_indexes,])
 
-mean((predict(train_fit,newdata=data.frame(x=data$x[-train_subset_indexes]))-data$y[-train_subset_indexes])^2)
+print (mean((predict(train_fit,newdata=data.frame(x=data$x[-train_subset_indexes]))-data$y[-train_subset_indexes])^2))
+```
 
+\textbf{e)}
+
+```{r}
 mse <- c()
-train_sizes = c(10, 40, 80, 90, 30)
+#train_sizes = c(10, 40, 80, 90, 30)
+split_index = 1:5
 for (i in seq(1,5)){
-  train_subset_indexes <- sample(100,train_sizes[i])
+  train_subset_indexes <- sample(100,50)
   train_fit = lm(y ~ poly(x,2),data=data[train_subset_indexes,])
   
   mse<-c(mse,mean((predict(train_fit,newdata=data.frame(x=data$x[-train_subset_indexes]))-data$y[-train_subset_indexes])^2))
 }
 
-print (cbind(train_sizes,mse))
+print (cbind(split_index,mse))
 
-# according to https://rpubs.com/maulikpatel/226237 we can use
-# the boot pacakge 
 
+```
+
+We see that for each split we get a slightly different MSE. This is because we have introduced randomness into the MSE by selecting a random subset of 50 data points to select as the training set.
+
+\textbf{f)}
+
+```{r}
 library(boot)
 set.seed(1000)
 LOOCV <- c()
@@ -149,13 +169,12 @@ glm.fit = glm(y ~ poly(x,4), data=data)
 LOOCV <- c(LOOCV,round(cv.glm(data, glm.fit)$delta[1],3))
 
 print (cbind(model_num,LOOCV))
-
 ```
 
 
 
 
-
+\textbf{g)}
 
 ```{r}
 set.seed(1)
@@ -180,6 +199,7 @@ print (cbind(model_num,LOOCV))
 
 The LOOCV scores do not change at all, which makes sense because there is no sampling method, we leave out each observation deterministically. 
 
+\textbf{h)}
 
 The second model had the best score because it is the true model. 
 
