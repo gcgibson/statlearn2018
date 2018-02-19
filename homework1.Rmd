@@ -83,8 +83,23 @@ $$ \sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} = w(\sigma_1^2 +\sigma_2^2 -\sigma_{1
 
 $$ w = \frac{\sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} }{\sigma_1^2 -\sigma_2^2 -\sigma_{12} + \sigma_{12} + (b_1 - b_2 )^2}  $$
 
-$$ w = \frac{\sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} }{\sigma_1^2 +\sigma_2^2  - 2\sigma_{12} + (b_1 - b_2 )^2}  $$
+$$ w = \frac{\sigma_2^2 -b_2(b_1 - b_2) -\sigma_{12} }{\sigma_1^2 +\sigma_2^2  - 2\sigma_{12} + (b_1 - b_2 )^2} I_{0\leq w\leq 1}  $$
 
+
+In order to show that this is truly a minimum we need to find the sign of the second derivative. 
+
+$$\frac{\delta^2 }{\delta^2 w} MSE(\hat{\beta})  = 2\sigma_1^2 + 2\sigma_2^2 - 2\sigma_{12} - 2\sigma_{12} + 2(b_1 - b_2 )^2  $$
+We know by the Cauchy-Schwarz inequality that that 
+$$\sigma_{12} < \sigma_1\sigma_2$$
+
+$$2\sigma_{12} < 2\sigma_1\sigma_2$$
+$$-2\sigma_{12} > -2\sigma_1\sigma_2$$
+
+$$-2\sigma_{12} + \sigma_1^2 +\sigma_2^2 > -2\sigma_1\sigma_2 + \sigma_1^2+\sigma_2^2$$
+$$2\sigma_{12} + \sigma_1^2+\sigma_2^2 > (\sigma_1 - \sigma_2)^2 $$
+
+
+So we see that the second derivative is $\geq 0$ and we have indeed found a minimum. 
 ### Problem 2
 
 \textbf{a)}
@@ -93,7 +108,7 @@ This model corresponds to
 
 $$Y \sim N(5 - x + 2*x^2,1)$$
 
-where $n=100,p=3$
+where $n=100,p=2$
 
 \textbf{b)}
 
@@ -116,6 +131,7 @@ According to the scatterplot there seems to be a quadratic relationship between 
 
 
 fit = lm(y ~ poly(x,2),data=data)
+print (fit)
 ```
 
 \textbf{d)}
