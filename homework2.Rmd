@@ -24,7 +24,7 @@ $$[X_1,X_1,X_3,X_4],[X_1,X_1,X_3,X_3],[X_1,X_1,X_3,X_1],[X_1,X_1,X_3,X_2]$$
 \textbf{b)}
 If $n=10$ then the probability that $X_1 \in B$ exactly $k$ times is simply binomial 
 
-$$\binom{n}{k} (\frac{1}{10})^{k}(\frac{9}{p})^{10-k}$$
+$$\binom{n}{k} (\frac{1}{10})^{k}(\frac{9}{10})^{10-k}$$
 
 which we can see is 
 
@@ -61,12 +61,17 @@ print (store['4']/N)
 ```
 
 ### Problem 2
-Suppose that $\hat{\phi} = m(\hat{\theta})$ for $m(*)$ is a monotone function. The $p$-value based on the permutation test based on $\hat{\theta} = P(\hat{\theta}^* \geq \hat{\theta})$
+Suppose that $\hat{\phi} = m(\hat{\theta})$ for $m(*)$ is a monotone function. 
+$$ P(\hat{\theta}^* \geq \hat{\theta})$$ is by definition 
 
-As long as $m$ is a monotone function we can simply take 
-$$ P(m(\hat{\theta}^*) \geq m(\hat{\theta}))$$ which by definition is 
+$$ = \frac{\#(\hat{\theta}^* - \hat{\theta})}{\binom{N}{n}}$$
 
-$$ASL_{perm}(\hat{\phi})$$
+$$ = \frac{\#(m(\hat{\theta})^* - \hat{m(\theta)})}{\binom{N}{n}}$$  
+  
+  
+  
+$$ = ASL_{perm}(\hat{\phi})$$
+
 ### Problem 3
 
 
@@ -79,7 +84,44 @@ We can use the result from problem $2$ as long as we can show that
 
 $$m(x) =  \frac{x}{\bar{\sigma}\sqrt{\frac{1}{n}+\frac{1}{m}}}$$
 
-Is a monotonically increasing function. We know that the denominator is positive regardless of $\bar{z}$ and $\bar{y}$, so clearly this is an increasing function in x. 
+Is a monotonically increasing function.
+
+In order to show this is monotonically increasing, we need to show if
+
+$$x > y \rightarrow m(x) > m(y)$$
+
+I claim that we can re-write $$m(x) = \frac{\bar{z} - \bar{y}}{\sqrt{\frac{[\sum_i (z_i-\bar{z})^2+(y_i-\bar{y})^2]}{n+m-2}}\sqrt{\frac{1}{n}+\frac{1}{m}}}$$ 
+
+as a function in the form $$m(x) = \frac{x}{c(x + a)^2}$$
+  
+Clearly, we can absorb terms involing $n,m$ into $c$. Since $x = \bar{z} - \bar{y}$ we can write $\bar{z} = x+ \bar{y}$, and similarly for $\bar{y} = x+\bar{z}$, so we see the denominator become..
+
+$$(z_i- x + \bar{z})^2+(y_i  - x+\bar{y})^2$$
+  
+  which we can factor as some quadratic in $x$, say $(x+a)^2$.
+  
+  
+Now consider $m(x) > m(y)$
+$$ \frac{x}{c(x+a)^2 } > \frac{y}{c(y+a)^2 } $$
+
+where we distilled the quadratic function of $\bar{\sigma}$ into an a quadratic function. 
+
+If we expand this out
+
+$$ xc(y-a)^2 > yc(x-a)^2  $$
+
+$$ x(y-a)^2 > y(x-a)^2  $$
+$$ x(y^2-2ay +a^2) > y(x^2-2ax + a^2)  $$
+$$ xy^2-2xay +xa^2 > yx^2-2ayx + ya^2  $$
+$$ xy^2 +xa^2 > yx^2 + ya^2  $$
+$$ xa^2 > ya^2  $$
+
+$$ x > y  $$
+
+Thus, starting from $x>y$, we can work backwards and see that $m(x) > m(y)$, therefore $ASL(\hat{\phi}) = ASL(\hat{\theta})$.
+
+
+
 ### Problem 4
 
 Suppose we have 
