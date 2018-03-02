@@ -309,7 +309,8 @@ p.value.1
 hist(test.2, nclass=50, col=8, main="", xlab="permutation test statistic")
 abline(v=obs.test.stat, col=2, lty="dashed")
 ```
-
+ 
+Here we can also reject $H_0$ at $\alpha=.05$ level.
 
 \textbf{e)}
 
@@ -345,6 +346,7 @@ abline(v=obs.test.stat, col=2, lty="dashed")
 
 ```
 
+Using the median we fail to rejeect $H_0$ at $\alpha=.05$ level.
 
 
 ### Problem 6

@@ -1,0 +1,111 @@
+---
+title: "Homework 3"
+author: "Casey Gibson"
+date: "3/1/2018"
+output: html_document
+---
+### Problem 1
+
+#### a
+Best subset selection will have the smallest training RSS, because it is able to search accross all models to choose the best one. Forward and backward selection may have the same training RSS, but not lower.
+
+#### b
+
+Since any of these selection techniques are prone to overfitting there is no way to know a-priori which will have the lowest test RSS.
+
+#### c
+
+##### i
+True
+
+##### ii
+True
+
+##### iii
+False
+
+##### iv
+False
+
+##### v
+False
+
+
+### Problem 2
+
+#### a)
+iii
+
+#### b)
+iii 
+
+### Problem 3
+
+#### a)
+iv
+
+#### b)
+ii
+
+#### c)
+iii
+
+#### d)
+iv
+
+### Problem 4
+
+$$\sum_{i=1}^n (y_i - \beta_0 - \sum_{j=1}^p x_{ij}\beta_j)^2 + \lambda \sum_{j=1}^p \beta_j^2$$
+We can add and subtract $0$ in the following way 
+
+$$\sum_{i=1}^n (y_i - \beta_0 -\sum_{j=1}^p \bar{x_j}\beta_j + \sum_{j=1}^p \bar{x_j}\beta_j - \sum_{j=1}^p x_{ij}\beta_j)^2 + \lambda \sum_{j=1}^p \beta_j^2$$
+$$\sum_{i=1}^n (y_i - (\beta_0+\sum_{j=1}^p \bar{x_j}\beta_j ) - \sum_{j=1}^p (x_{ij} -\bar{x_j})\beta_j)^2 + \lambda \sum_{j=1}^p \beta_j^2$$
+So we can see from this that 
+
+$$\beta_0^c = \beta_0 + \sum_{j=1}^p \bar{x_j}\beta_j$$
+and all other $\beta_j^c = \beta_j \ for \ j \neq 0$.
+
+And that by minimizing the first, we are indeed minimizing the second. We could have also shown this using the partial derivative hint, but this seems easier.
+
+
+
+
+### Problem 5
+
+#### a
+
+```{r}
+set.seed(1)
+p = 20
+n = 1000
+
+beta <- c(rep(1,5),rep(0,15))
+xs <- matrix(rnorm(n*p,0,sqrt(2)),nrow=n,ncol=p) 
+error <- rnorm(n,0,sqrt(2))
+
+y <- beta*xs + error
+
+head(y)
+```
+
+#### b
+```{r}
+train_indexes <- sample(1:n,500,replace = FALSE)
+train <- y[train_indexes]
+test <- y[-train_indexes]
+```
+
+#### c
+
+```{r}
+library(ISLR)
+library(leaps)
+
+df_ <- data.frame(y = y)
+for(j in 1:p){
+  df_[j] <- xs[,j]
+}
+regfit.full=regsubsets(y~.,df_)
+summary(regfit.full)
+
+```
