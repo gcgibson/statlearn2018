@@ -83,16 +83,19 @@ beta <- c(rep(1,5),rep(0,15))
 xs <- matrix(rnorm(n*p,0,sqrt(2)),nrow=n,ncol=p) 
 error <- rnorm(n,0,sqrt(2))
 
-y <- beta*xs + error
+y <- xs%*%beta + error
 
 head(y)
 ```
 
 #### b
 ```{r}
-train_indexes <- sample(1:n,500,replace = FALSE)
-train <- y[train_indexes]
-test <- y[-train_indexes]
+train_indexes <- sample(n,size=500,replace = FALSE)
+train_y <- y[train_indexes]
+test_y <- y[-train_indexes]
+
+train_x <- xs[train_indexes,]
+test_x <- xs[-train_indexes,]
 ```
 
 #### c
@@ -101,11 +104,81 @@ test <- y[-train_indexes]
 library(ISLR)
 library(leaps)
 
-df_ <- data.frame(y = y)
-for(j in 1:p){
-  df_[j] <- xs[,j]
+data.train =data.frame(y = train_y,x = train_x)
+data.test =data.frame(y = test_y,x = test_x)
+
+regfit = regsubsets(y ~. ,data=data.train,nvmax=20)
+
+data.train$"(Intercept)" <- rep(0,500) 
+errors <- rep(NA,20)
+
+for (i in 1:20){
+  coef = coef(regfit, id=i)
+  pred <- as.matrix(data.train[,names(coef)])%*%matrix(coef,ncol=1)
+  print (pred)
+  errors[i]=mean((data.train$y-pred)^2)
 }
-regfit.full=regsubsets(y~.,df_)
-summary(regfit.full)
+
+plot(errors)
+
+
+```
+
+#### d
+```{r}
+library(ISLR)
+library(leaps)
+
+data.train =data.frame(y = train_y,x = train_x)
+regfit = regsubsets(y ~. ,data=data.train,nvmax=20)
+
+data.test$"(Intercept)" <- rep(1,500) 
+errors <- rep(NA,20)
+
+for (i in 1:20){
+  coef = coef(regfit, id=i)
+  pred <- as.matrix(data.test[,names(coef)])%*%matrix(coef,ncol=1)
+  errors[i]=mean((data.test$y-pred)^2)
+}
+
+plot(errors,type="b",pch=19)
+print (which.min(errors))
+```
+
+
+### Problem 6
+
+#### a
+
+```{r}
+library(MASS)
+require(glmnet)  # ridge and lasso
+
+data(Boston)
+set.seed(1)
+
+xmat <- model.matrix(crim~., data=Boston)
+crim_vals <- Boston$crim
+
+# lasso regression model
+fit.lasso <- cv.glmnet(xmat, crim_vals, alpha=1)
+(lambda <- fit.lasso$lambda.min)  # optimal lambda
+pred.lasso <- predict(fit.lasso, s=lambda, newx=xmat.test)
+(err.lasso <- mean((test$crim - pred.lasso)^2))  # test error
+predict(fit.lasso, s=lambda, type="coefficients")
+
+
+```
+
+
+#### b
+```{r}
+
+# ridge regression model
+fit.ridge <- cv.glmnet(xmat, crim_vals, alpha=0)
+(lambda <- fit.ridge$lambda.min)  # optimal lambda
+pred.ridge <- predict(fit.ridge, s=lambda, newx=xmat.test)
+(err.ridge <- mean((test$crim - pred.ridge)^2))  # test error
+predict(fit.ridge, s=lambda, type="coefficients")
 
 ```
