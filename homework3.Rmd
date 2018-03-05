@@ -2,7 +2,9 @@
 title: "Homework 3"
 author: "Casey Gibson"
 date: "3/1/2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ### Problem 1
 
@@ -16,42 +18,43 @@ Since any of these selection techniques are prone to overfitting there is no way
 #### c
 
 ##### i
-True
+True - forward selection can only add predictors to the existing $k$-variable model.
 
 ##### ii
-True
+True - the $k$-variable is obtained by removing a variable from the $k+1$-variable model.
 
 ##### iii
-False
+False - No link exists between forward and backward selection.
 
 ##### iv
-False
+False - see above
 
 ##### v
-False
+False - Best subset selection is allowed to vary all predictors when going from $k$-variable to $k+1$-variable models.
 
 
 ### Problem 2
 
 #### a)
-iii
+iii - Less flexible because we have imposed a constraint on the $\beta$s and improved prediction accuracy. This constraint also reduces the variance, and as long as the bias increase is smaller than the variance decrease, the MSE will go down.
 
 #### b)
-iii 
+iii - Less flexible because we have imposed a constraint on the $\beta$s and improved prediction accuracy. This constraint also reduces the variance, and as long as the bias increase is smaller than the variance decrease, the MSE will go down.
 
 ### Problem 3
 
 #### a)
-iv
+iv - As we relax the constraints on $\beta$ the model is more flexible so we expect a decrease on the training data. 
 
 #### b)
-ii
+ii -  As we relax the constraints on $\beta$ the model is more flexible so we expect a decrease on the testing data at first, until we overfit. 
+
 
 #### c)
-iii
+iii - Variance increases as the model becomes more flexible because we have more possible $\beta$ values with positive probability. 
 
 #### d)
-iv
+iv - Bias decreases as the model becomes more flexible, since the OLS estimate is unbiased and the fully unconstrained estimate = OLS. 
 
 ### Problem 4
 
@@ -85,7 +88,6 @@ error <- rnorm(n,0,sqrt(2))
 
 y <- xs%*%beta + error
 
-head(y)
 ```
 
 #### b
@@ -115,11 +117,11 @@ errors <- rep(NA,20)
 for (i in 1:20){
   coef = coef(regfit, id=i)
   pred <- as.matrix(data.train[,names(coef)])%*%matrix(coef,ncol=1)
-  print (pred)
+ # print (pred)
   errors[i]=mean((data.train$y-pred)^2)
 }
 
-plot(errors)
+plot(errors,type="b",main="Training MSE",xlab="Num Predictors",ylab="MSE",pch=19,ylim=c(0,15))
 
 
 ```
@@ -141,44 +143,83 @@ for (i in 1:20){
   errors[i]=mean((data.test$y-pred)^2)
 }
 
-plot(errors,type="b",pch=19)
+plot(errors,type="b",pch=19,main="Testing MSE",xlab="Num Predictors",ylab="MSE",ylim=c(0,15))
+```
+
+#### e
+
+```{r}
+
 print (which.min(errors))
 ```
 
+We can see that the model with $5$ predictors has the lowest test MSE, which is consistent with the true underlying data generating mechanism since we selected 5 active predictors to generate the data. 
+
+
+#### f
+
+```{r}
+print (coef(regfit, id=20))
+```
+
+We can see the coefficients for the first 5 predictors are much higher than those of the remaining 15, which is again consistent with how we generated the data. 
 
 ### Problem 6
 
 #### a
 
-```{r}
+```{r, echo=FALSE,message=FALSE, warning=FALSE}
 library(MASS)
 require(glmnet)  # ridge and lasso
-
+grid=10^seq(10,-2,length=100)
 data(Boston)
 set.seed(1)
 
-xmat <- model.matrix(crim~., data=Boston)
-crim_vals <- Boston$crim
+x <- model.matrix(crim~., data=Boston)[,-1]
+y <- Boston$crim
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
 
-# lasso regression model
-fit.lasso <- cv.glmnet(xmat, crim_vals, alpha=1)
-(lambda <- fit.lasso$lambda.min)  # optimal lambda
-pred.lasso <- predict(fit.lasso, s=lambda, newx=xmat.test)
-(err.lasso <- mean((test$crim - pred.lasso)^2))  # test error
-predict(fit.lasso, s=lambda, type="coefficients")
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
 
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
 
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)
+print (bestlam)
+lasso.coef
 ```
 
-
-#### b
+#### b 
 ```{r}
 
-# ridge regression model
-fit.ridge <- cv.glmnet(xmat, crim_vals, alpha=0)
-(lambda <- fit.ridge$lambda.min)  # optimal lambda
-pred.ridge <- predict(fit.ridge, s=lambda, newx=xmat.test)
-(err.ridge <- mean((test$crim - pred.ridge)^2))  # test error
-predict(fit.ridge, s=lambda, type="coefficients")
+
+set.seed(1)
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
+
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+predict(out,type="coefficients",s=bestlam)
+
 
 ```
+
+#### c 
+
+```{r}
+
+print (mean((lasso.pred-y.test)^2))
+print (mean((ridge.pred-y.test)^2))
+```
+#### d
+
+We see that both age and tax are zeroed out in the lasso model, which has a lower MSE than ridge. 
