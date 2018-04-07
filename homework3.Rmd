@@ -168,7 +168,7 @@ We can see the coefficients for the first 5 predictors are much higher than thos
 
 #### a
 
-```{r, echo=FALSE,message=FALSE, warning=FALSE}
+```{r}
 library(MASS)
 require(glmnet)  # ridge and lasso
 grid=10^seq(10,-2,length=100)
@@ -193,7 +193,7 @@ lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
 
 out=glmnet(x,y,alpha=1,lambda=grid)
 lasso.coef=predict(out,type="coefficients",s=bestlam)
-print (bestlam)
+print (c("Best Lambda", bestlam))
 lasso.coef
 ```
 
@@ -201,15 +201,15 @@ lasso.coef
 ```{r}
 
 
-set.seed(1)
-ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
-
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid)
+plot(ridge.mod)
 cv.out=cv.glmnet(x[train,],y[train],alpha=0)
 plot(cv.out)
 bestlam=cv.out$lambda.min
 ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
-predict(out,type="coefficients",s=bestlam)
-
+ridge.coef = predict(out,type="coefficients",s=bestlam)
+print (c("Best Lambda", bestlam))
+ridge.coef
 
 ```
 

@@ -1,0 +1,27 @@
+---
+title: "Homework 4"
+author: "Casey Gibson"
+date: "4/6/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problem 1 
+#### a) 
+No
+#### b)
+No 
+#### c)
+PLS takes into accout the correlation between th predictors and the respone, whereas PCR ignores it. 
+
+### Problem 2
+
+#### a)
+$$\hat{p(X)} = \frac{e^{\beta_0 + \beta_1x_1 + \beta_2x_2} }{1+e^{\beta_0 + \beta_1x_1 + \beta_2x_2}}$$
+
+$$\hat{p(X)} = \frac{e^{-6+.05*40+3.5} }{1+e^{-6+.05*40+3.5}}= .3775$$
+
+#### b)
