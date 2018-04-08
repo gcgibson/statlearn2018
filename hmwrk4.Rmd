@@ -12,11 +12,17 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ### Problem 1 
+
 #### a) 
+
 No
+
 #### b)
+
 No 
+
 #### c)
+
 PLS takes into accout the correlation between th predictors and the respone, whereas PCR ignores it. 
 
 ### Problem 2
@@ -59,29 +65,30 @@ $$p_1(x_2,x_2) = p_1(x_1)p_1(x_2) \propto p(X_1 = x_1 | Y_1)p(X_2 = x_2 | Y_1)p(
 
 by independence 
 
-$$ = \pi_1 \frac{1}{\sqrt{2\pi\sigma_1}}exp(-\frac{1}{2\sigma_1^2}(x_1-\mu_{11})^2)\frac{1}{\sqrt{2\pi\sigma_1}}exp(-\frac{1}{2\sigma_1^2}(x_2-\mu_{12})^2)$$
-$$ = \pi_1 \frac{1}{2\pi\sigma_1} exp(-\frac{1}{2\sigma_1^2}(x_1-\mu_{11})^2 +-\frac{1}{2\sigma_1^2}(x_2-\mu_{12})^2 )$$
+$$ = \pi_1 \frac{1}{\sqrt{2\pi\sigma_1}}exp(-\frac{1}{2\sigma_1^2}(x_1-\mu_{11})^2)\frac{1}{\sqrt{2\pi\sigma_2}}exp(-\frac{1}{2\sigma_2^2}(x_2-\mu_{12})^2)$$
+$$ = \pi_1 \frac{1}{2\pi\sigma_1\sigma_2} exp(-\frac{1}{2\sigma_1^2}(x_1-\mu_{11})^2 +-\frac{1}{2\sigma_2^2}(x_2-\mu_{12})^2 )$$
 
 
 taking logs we can see that 
 
-$$= -\frac{1}{2\sigma_1^2}(x_1-\mu_{11})^2 +-\frac{1}{2\sigma_1^2}(x_2-\mu_{12})^2 + log(\pi_1) - log(2\pi\sigma_1)$$
+$$= -\frac{1}{2\sigma_1^2}(x_1-\mu_{11})^2 +-\frac{1}{2\sigma_2^2}(x_2-\mu_{12})^2 + log(\pi_1) - log(2\pi\sigma_1\sigma_2)$$
 
-$$= -\frac{1}{2\sigma_1^2}(x_1^2-2\mu_{11}x_1 + \mu_{11}^2) +-\frac{1}{2\sigma_1^2}(x_2^2-2x_2\mu_{12} + \mu_{21}^2) + log(\pi_1) - log(2\pi\sigma_1)$$
+$$= -\frac{1}{2\sigma_1^2}(x_1^2-2\mu_{11}x_1 + \mu_{11}^2) +-\frac{1}{2\sigma_2^2}(x_2^2-2x_2\mu_{12} + \mu_{12}^2) + log(\pi_1) - log(2\pi\sigma_1\sigma_2)$$
 By symmetry, we arrive at the same probability for $p_2$ except with $\mu_{22},\mu_{21}, \sigma_2$ for parameters.
-$$= -\frac{1}{2\sigma_2^2}(x_1^2-2\mu_{21}x_1 + \mu_{21}^2) +-\frac{1}{2\sigma_2^2}(x_2^2-2x_2\mu_{22} + \mu_{21}^2) + log(\pi_2) - log(2\pi\sigma_2)$$
+$$= -\frac{1}{2\sigma_1^2}(x_1^2-2\mu_{21}x_1 + \mu_{21}^2) +-\frac{1}{2\sigma_2^2}(x_2^2-2x_2\mu_{22} + \mu_{22}^2) + log(\pi_1) - log(2\pi\sigma_1\sigma_2)$$
 Subtracting these two we get 
 
-$$\frac{-1}{2}(\frac{1}{\sigma_1^2} + \frac{1}{\sigma_2^2})[(2\mu_11-2\mu_{21})x_1 + \mu_{21}^2-\mu_{11}^2 + (2\mu_{12} - 2\mu_{22})x_2] + log(\frac{\pi_1}{\pi_2}) + log(\frac{\sigma_2}{\sigma_1})$$
 
 
+$$-\frac{1}{2\sigma_1^2}x_1^2 + \frac{1}{\sigma_1^2}\mu_{11}x_1 -\frac{\mu_{11}^2}{2\sigma_1^2}  - \frac{1}{2\sigma_2^2}x_2^2 + \frac{1}{\sigma_2^2}\mu_{12}x_2 -\frac{\mu_{12}^2}{2\sigma_2^2}$$
++
+$$\frac{1}{2\sigma_1^2}x_1^2 - \frac{1}{\sigma_1^2}\mu_{21}x_1 +\frac{\mu_{21}^2}{2\sigma_1^2}  + \frac{1}{2\sigma_2^2}x_2^2 - \frac{1}{\sigma_2^2}\mu_{22}x_2 +\frac{\mu_{22}^2}{2\sigma_2^2} $$
 
+$$c_0 = log(\frac{\pi_1}{\pi_2}) + \frac{\mu_{22}^2}{2\sigma_2^2}  -\frac{\mu_{11}^2}{2\sigma_1^2} +\frac{\mu_{21}^2}{2\sigma_1^2}-\frac{\mu_{12}^2}{2\sigma_2^2} $$
 
-Mapping this onto the logistic regression setting we see that 
-$$c_0 = log(\frac{\pi_1}{\pi_2}) + log(\frac{\sigma_2}{\sigma_1}) +\frac{-1}{2}(\frac{1}{\sigma_1^2} + \frac{1}{\sigma_2^2})\mu_{21}^2 - \frac{-1}{2}(\frac{1}{\sigma_1^2} + \frac{1}{\sigma_2^2}) \mu_{11}^2$$
+$$c_1 = \frac{\mu_{11}}{\sigma_1^2} - \frac{\mu_{21}}{\sigma_1^2}$$
 
-$$c_1 = \frac{-1}{2}(\frac{1}{\sigma_1^2} + \frac{1}{\sigma_2^2})(2\mu_{11}-2\mu_{21})$$
-$$c_2 = \frac{-1}{2}(\frac{1}{\sigma_1^2} + \frac{1}{\sigma_2^2})(2\mu_{12} - 2\mu_{22})$$
+$$c_2 = \frac{\mu_{21}}{\sigma_2^2} - \frac{\mu_{22}}{\sigma_2^2}$$
 
 
 
